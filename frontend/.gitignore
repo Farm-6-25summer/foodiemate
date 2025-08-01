@@ -8,6 +8,10 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+.expo-shared/
+android/
+ios/
+.cache/
 
 # Native
 .kotlin/
@@ -25,13 +29,26 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+yarn.lock
 
 # macOS
 .DS_Store
 *.pem
 
-# local env files
+# env files
+.env
+.env.local
 .env*.local
 
 # typescript
 *.tsbuildinfo
+
+# Windows junk
+Thumbs.db
+
+# VSCode / IDE settings
+.vscode/
+.idea/
+
+# Logs
+*.log
