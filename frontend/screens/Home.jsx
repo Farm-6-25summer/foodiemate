@@ -98,7 +98,7 @@ export default function Home({ navigation }) {
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate("MatchDetail", { postId: item.id })}
+      onPress={() => navigation.navigate("MatchDetail", { post: item })}
       activeOpacity={0.8}
     >
       <View style={styles.cardHeader}>
