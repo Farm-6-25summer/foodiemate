@@ -130,8 +130,6 @@ export default function Login({ navigation }) {
           <Text style={styles.linkText}>아이디/비밀번호 찾기</Text>
         </TouchableOpacity>
       </View>
-
-      <Text style={styles.note}>* 실제 백엔드 준비되면 API 연동</Text>
     </View>
   );
 }
