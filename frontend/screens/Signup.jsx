@@ -1,3 +1,4 @@
+// Signup.jsx
 import React from "react";
 import {
   View,
@@ -12,39 +13,56 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Login({ navigation }) {
+export default function Signup({ navigation }) {
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
-    defaultValues: { email: "", password: "" },
+    defaultValues: {
+      email: "",
+      password: "",
+      passwordConfirm: "",
+    },
   });
 
   const onSubmit = async (data) => {
+    if (data.password !== data.passwordConfirm) {
+      Alert.alert(
+        "비밀번호 오류",
+        "비밀번호와 비밀번호 확인이 일치하지 않습니다."
+      );
+      return;
+    }
+
     try {
-      const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
-      console.log("AsyncStorage - ProfileSetupDone:", profileSetupDone);
-      console.log("입력된 이메일:", data.email);
-      console.log("입력된 비밀번호:", data.password);
+      const response = await fetch(
+        "https://fe66c90452d7.ngrok-free.app/api/signup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        }
+      );
 
-      if (!data.email || !data.password) {
-        throw new Error("이메일과 비밀번호를 입력해주세요.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "회원가입 실패");
       }
 
-      await AsyncStorage.setItem("LoggedIn", "true");
-
-      if (profileSetupDone === "true") {
-        navigation.navigate("MainTabs", { screen: "Home" });
-      } else {
-        navigation.navigate("ProfileSetup");
-      }
+      Alert.alert(
+        "회원가입 성공",
+        "회원가입이 완료되었습니다. 로그인 화면으로 이동합니다."
+      );
+      navigation.replace("Login");
     } catch (error) {
       Alert.alert(
-        "로그인 실패",
-        error.message || "아이디나 비밀번호를 확인해 주세요."
+        "회원가입 실패",
+        error.message || "입력 정보를 확인해주세요."
       );
     }
   };
@@ -52,7 +70,7 @@ export default function Login({ navigation }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        <Text style={styles.title}>로그인</Text>
+        <Text style={styles.title}>회원가입</Text>
 
         <Controller
           control={control}
@@ -66,8 +84,8 @@ export default function Login({ navigation }) {
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
-              placeholder="이메일(@dgu.ac.kr)"
-              placeholderTextColor={"#FF9728"}
+              placeholder="이메일"
+              placeholderTextColor="#FF9728"
               value={value}
               onChangeText={onChange}
               keyboardType="email-address"
@@ -90,7 +108,7 @@ export default function Login({ navigation }) {
           render={({ field: { onChange, value } }) => (
             <TextInput
               placeholder="비밀번호"
-              placeholderTextColor={"#FF9728"}
+              placeholderTextColor="#FF9728"
               value={value}
               onChangeText={onChange}
               secureTextEntry
@@ -102,48 +120,56 @@ export default function Login({ navigation }) {
           <Text style={styles.errorText}>{errors.password.message}</Text>
         )}
 
+        <Controller
+          control={control}
+          name="passwordConfirm"
+          rules={{
+            required: "비밀번호 확인을 입력하세요.",
+            minLength: { value: 6, message: "최소 6자리 이상이어야 합니다." },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              placeholder="비밀번호 확인"
+              placeholderTextColor="#FF9728"
+              value={value}
+              onChangeText={onChange}
+              secureTextEntry
+              style={[
+                styles.input,
+                errors.passwordConfirm && styles.errorInput,
+              ]}
+            />
+          )}
+        />
+        {errors.passwordConfirm && (
+          <Text style={styles.errorText}>{errors.passwordConfirm.message}</Text>
+        )}
+
         <Pressable
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitting}
           style={({ pressed }) => [
-            styles.loginButton,
-            isSubmitting && styles.loginButtonDisabled,
+            styles.registerButton,
+            isSubmitting && styles.registerButtonDisabled,
             pressed && !isSubmitting && { opacity: 0.8 },
           ]}
           accessibilityRole="button"
           accessibilityState={{ disabled: isSubmitting }}
         >
           {isSubmitting ? (
-            <ActivityIndicator />
+            <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.loginButtonText}>로그인</Text>
+            <Text style={styles.registerButtonText}>회원가입</Text>
           )}
         </Pressable>
 
         <View style={styles.row}>
-          <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
-            <Text style={styles.linkText}>회원가입</Text>
-          </TouchableOpacity>
-          <Text style={styles.separator}>|</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("IdpwFind")}>
-            <Text style={styles.linkText}>아이디/비밀번호 찾기</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.linkText}>로그인</Text>
           </TouchableOpacity>
         </View>
 
-        <Pressable
-          onPress={async () => {
-            await AsyncStorage.removeItem("ProfileSetupDone");
-            await AsyncStorage.removeItem("age");
-            await AsyncStorage.removeItem("disease");
-            await AsyncStorage.removeItem("disability");
-            Alert.alert("초기화 완료", "프로필 정보가 초기화되었습니다.");
-          }}
-          style={{ marginTop: 20, padding: 10, backgroundColor: "#f00" }}
-        >
-          <Text style={{ color: "#fff", textAlign: "center" }}>
-            프로필 초기화
-          </Text>
-        </Pressable>
+        <Text style={styles.note}>* 실제 백엔드 준비되면 API 연동</Text>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -159,60 +185,57 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "700",
-    marginBottom: 60,
+    marginBottom: 40,
     textAlign: "center",
+    color: "#FF9728",
   },
   input: {
     borderRadius: 8,
     padding: 20,
     marginBottom: 17,
-    backgroundColor: "#fff6eb", // 변경
+    backgroundColor: "#fff6eb", // 주황 톤 배경
     width: "100%",
     maxWidth: 400,
     height: 60,
   },
-  loginButton: {
-    backgroundColor: "#FF9728", // 변경
+  registerButton: {
+    backgroundColor: "#FF9728",
     padding: 20,
     borderRadius: 8,
     alignItems: "center",
     width: "100%",
     maxWidth: 400,
     height: 60,
-    shadowColor: "#FFCE93", // 변경
+    shadowColor: "#FFCE93",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 4,
   },
-  loginButtonDisabled: {
+  registerButtonDisabled: {
     opacity: 0.5,
-    cursor: "not-allowed", // 변경
   },
-  loginButtonText: {
+  registerButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "500",
   },
-  errorInput: { borderColor: "#e74c3c" },
+  errorInput: { borderColor: "#e74c3c", borderWidth: 1 },
   errorText: { color: "#e74c3c", marginBottom: 8 },
   row: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
     marginTop: 28,
   },
   linkText: {
-    color: "#FF9728", // 변경
+    color: "#FF9728",
     fontSize: 14,
     fontWeight: "500",
-    marginHorizontal: 6,
   },
-  separator: {
-    color: "#FF9728", // 변경
-    marginHorizontal: 6,
-    fontWeight: "400",
-    fontSize: 14,
+  note: {
+    marginTop: 12,
+    fontSize: 12,
+    color: "#666",
+    textAlign: "center",
   },
-  note: { marginTop: 12, fontSize: 12, color: "#666", textAlign: "center" },
 });
