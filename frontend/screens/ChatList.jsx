@@ -11,19 +11,23 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const posts = [
-  { id: "1", time: "동대생1 님", title: "외 1인", desc: "네 좀 이따 뵐게요~" },
-  { id: "2", time: "abcd 님", title: "외 3인", desc: "조심히 들어가세요!" },
+  { 
+    id: "1", time: "김동국 님", title: "외 1인", 
+    desc: "네 좀 이따 뵐게요~", 
+    avatar: "https://i.pravatar.cc/100?img=1", },
+  { 
+    id: "2", time: "이아코 님", title: "외 3인",
+    desc: "조심히 들어가세요!", 
+    avatar: "https://i.pravatar.cc/100?img=2", },
   {
-    id: "3",
-    time: "Text 님",
-    title: "외 2인",
+    id: "3", time: "박남산 님", title: "외 2인",
     desc: "네 나중에 또 같이 밥 먹어요ㅎㅎ",
+    avatar: "https://i.pravatar.cc/100?img=5",
   },
   {
-    id: "4",
-    time: "efg 님",
-    title: "외 2인",
+    id: "4", time: "난아코 님", title: "외 2인",
     desc: "담에 또 봐요 조심히 가세요!!",
+    avatar: "https://i.pravatar.cc/100?img=3",
   },
 ];
 
