@@ -11,6 +11,7 @@ const GOOGLE_PLACES_KEY = "YOUR_API_KEY"; // ← 실제 키로 교체 (Places AP
 const FALLBACK = { latitude: 37.5665, longitude: 126.9780, latitudeDelta: 0.012, longitudeDelta: 0.012 };
 
 export default function MapScreen() {
+  const insets = useSafeAreaInsets();
   const mapRef = useRef(null);
   const [region, setRegion] = useState(null);
   const [loading, setLoading] = useState(true);
