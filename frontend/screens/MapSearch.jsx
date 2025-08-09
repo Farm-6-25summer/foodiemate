@@ -1,0 +1,56 @@
+// components/MapSearch.jsx
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+
+const GOOGLE_API_KEY = "YOUR_API_KEY"; // 실제 키로 교체
+
+export default function MapSearch({ onPlacePicked }) {
+  return (
+    <View style={styles.wrap}>
+      <GooglePlacesAutocomplete
+        placeholder="식당 검색"
+        debounce={300}
+        fetchDetails
+        enablePoweredByContainer={false}
+        onPress={(data, details = null) => {
+          if (!details) return;
+          const { lat, lng } = details.geometry.location;
+          onPlacePicked({
+            id: data.place_id,
+            name: details.name,
+            address: details.formatted_address,
+            location: { latitude: lat, longitude: lng },
+            rating: details.rating,
+          });
+        }}
+        query={{
+          key: GOOGLE_API_KEY,
+          language: "ko",
+          types: "establishment",
+          // 식당 위주로 필터링(선택)
+          // components: "country:kr",
+        }}
+        styles={{
+          textInput: styles.input,
+          container: { marginTop: 40 },
+          listView: { zIndex: 10 }, // 드롭다운 겹침 방지
+        }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  wrap: { flex: 1, 
+    paddingHorizontal: 12, 
+    paddingVertical: 6, 
+  },
+  input: {
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    paddingHorizontal: 12,
+    fontSize: 14,
+  },
+});
