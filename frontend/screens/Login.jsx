@@ -24,6 +24,44 @@ export default function Login({ navigation }) {
   });
 
   const onSubmit = async (data) => {
+    // 실제 백엔드와 연동했을 때 사용하는 코드
+    try {
+      const response = await fetch(
+        "https://f4a826201b7a.ngrok-free.app/api/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "로그인 실패");
+      }
+
+      await AsyncStorage.setItem("LoggedIn", "true");
+
+      const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
+
+      if (profileSetupDone === "true") {
+        navigation.navigate("MainTabs", { screen: "Home" });
+      } else {
+        navigation.navigate("ProfileSetup");
+      }
+    } catch (error) {
+      Alert.alert(
+        "로그인 실패",
+        error.message || "아이디나 비밀번호를 확인해 주세요."
+      );
+    }
+    /*
+    // 백엔드 연동하지 않고 테스트할 때 사용하는 코드
     try {
       const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
       console.log("AsyncStorage - ProfileSetupDone:", profileSetupDone);
@@ -47,8 +85,8 @@ export default function Login({ navigation }) {
         error.message || "아이디나 비밀번호를 확인해 주세요."
       );
     }
+    */
   };
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
@@ -66,8 +104,8 @@ export default function Login({ navigation }) {
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
-              placeholder="이메일(@dgu.ac.kr)"
-              placeholderTextColor={"#FF9728"}
+              placeholder="이메일"
+              placeholderTextColor={"#F57C00"}
               value={value}
               onChangeText={onChange}
               keyboardType="email-address"
@@ -90,7 +128,7 @@ export default function Login({ navigation }) {
           render={({ field: { onChange, value } }) => (
             <TextInput
               placeholder="비밀번호"
-              placeholderTextColor={"#FF9728"}
+              placeholderTextColor={"#F57C00"}
               value={value}
               onChangeText={onChange}
               secureTextEntry
@@ -108,13 +146,11 @@ export default function Login({ navigation }) {
           style={({ pressed }) => [
             styles.loginButton,
             isSubmitting && styles.loginButtonDisabled,
-            pressed && !isSubmitting && { opacity: 0.8 },
+            pressed && !isSubmitting && { opacity: 0.85 },
           ]}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: isSubmitting }}
         >
           {isSubmitting ? (
-            <ActivityIndicator />
+            <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.loginButtonText}>로그인</Text>
           )}
@@ -129,25 +165,13 @@ export default function Login({ navigation }) {
             <Text style={styles.linkText}>아이디/비밀번호 찾기</Text>
           </TouchableOpacity>
         </View>
-
-        <Pressable
-          onPress={async () => {
-            await AsyncStorage.removeItem("ProfileSetupDone");
-            await AsyncStorage.removeItem("age");
-            await AsyncStorage.removeItem("disease");
-            await AsyncStorage.removeItem("disability");
-            Alert.alert("초기화 완료", "프로필 정보가 초기화되었습니다.");
-          }}
-          style={{ marginTop: 20, padding: 10, backgroundColor: "#f00" }}
-        >
-          <Text style={{ color: "#fff", textAlign: "center" }}>
-            프로필 초기화
-          </Text>
-        </Pressable>
       </View>
     </TouchableWithoutFeedback>
   );
 }
+
+const ORANGE = "#F57C00";
+const LIGHT_ORANGE = "#FFF3E0";
 
 const styles = StyleSheet.create({
   container: {
@@ -166,20 +190,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     marginBottom: 17,
-    backgroundColor: "#fff6eb", // 변경
+    backgroundColor: LIGHT_ORANGE,
     width: "100%",
     maxWidth: 400,
     height: 60,
   },
   loginButton: {
-    backgroundColor: "#FF9728", // 변경
+    backgroundColor: ORANGE,
     padding: 20,
     borderRadius: 8,
     alignItems: "center",
     width: "100%",
     maxWidth: 400,
     height: 60,
-    shadowColor: "#FFCE93", // 변경
+    shadowColor: ORANGE,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
@@ -187,15 +211,20 @@ const styles = StyleSheet.create({
   },
   loginButtonDisabled: {
     opacity: 0.5,
-    cursor: "not-allowed", // 변경
   },
   loginButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "500",
   },
-  errorInput: { borderColor: "#e74c3c" },
-  errorText: { color: "#e74c3c", marginBottom: 8 },
+  errorInput: {
+    borderColor: "#e74c3c",
+    borderWidth: 1,
+  },
+  errorText: {
+    color: "#e74c3c",
+    marginBottom: 8,
+  },
   row: {
     flexDirection: "row",
     justifyContent: "center",
@@ -203,16 +232,25 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
   linkText: {
-    color: "#FF9728", // 변경
+    color: ORANGE,
     fontSize: 14,
     fontWeight: "500",
     marginHorizontal: 6,
   },
   separator: {
-    color: "#FF9728", // 변경
+    color: ORANGE,
     marginHorizontal: 6,
     fontWeight: "400",
     fontSize: 14,
   },
-  note: { marginTop: 12, fontSize: 12, color: "#666", textAlign: "center" },
+  resetButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#d32f2f",
+    borderRadius: 6,
+  },
+  resetButtonText: {
+    color: "#fff",
+    textAlign: "center",
+  },
 });

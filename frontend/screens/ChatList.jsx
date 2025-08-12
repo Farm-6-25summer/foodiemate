@@ -7,27 +7,69 @@ import {
   StyleSheet,
   Alert,
   StatusBar,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const posts = [
-  { 
-    id: "1", time: "김동국 님", title: "외 1인", 
-    desc: "네 좀 이따 뵐게요~", 
-    avatar: "https://i.pravatar.cc/100?img=1", },
-  { 
-    id: "2", time: "이아코 님", title: "외 3인",
-    desc: "조심히 들어가세요!", 
-    avatar: "https://i.pravatar.cc/100?img=2", },
   {
-    id: "3", time: "박남산 님", title: "외 2인",
-    desc: "네 나중에 또 같이 밥 먹어요ㅎㅎ",
-    avatar: "https://i.pravatar.cc/100?img=5",
+    id: "1",
+    time: "김동국 님",
+    title: "외 1인",
+    desc: "네 좀 이따 뵐게요~",
+    avatar:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSH8eWtajBr4f6nazCrWLan-Bq0QAlwZvZyHA&s",
   },
   {
-    id: "4", time: "난아코 님", title: "외 2인",
+    id: "2",
+    time: "이아코 님",
+    title: "외 3인",
+    desc: "조심히 들어가세요!",
+    avatar:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRD2gTimwZfhw-QIuoTfxQNfgQQb3s9hgy6sg&s",
+  },
+  {
+    id: "3",
+    time: "박남산 님",
+    title: "외 2인",
+    desc: "네 나중에 또 같이 밥 먹어요ㅎㅎ",
+    avatar:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0Gi4RC-_RrXyaEaiqR0YVMwfL2S4mV-_MJg&s",
+  },
+  {
+    id: "4",
+    time: "난아코 님",
+    title: "외 2인",
     desc: "담에 또 봐요 조심히 가세요!!",
-    avatar: "https://i.pravatar.cc/100?img=3",
+    avatar: "https://ui-avatars.com/api/?name=John+Doe&size=250",
+  },
+  {
+    id: "5",
+    time: "신공학관거주자 님",
+    title: "외 4인",
+    desc: "오늘 식사 즐거웠어요~",
+    avatar: "https://ui-avatars.com/api/?name=Shingong-Hak&size=250",
+  },
+  {
+    id: "6",
+    time: "김동국학생 님",
+    title: "외 1인",
+    desc: "다음에도 시간 되면 봐요!",
+    avatar: "https://i.pravatar.cc/250",
+  },
+  {
+    id: "7",
+    time: "충무로인간 님",
+    title: "외 2인",
+    desc: "역까지 잘 가세요~",
+    avatar: "https://i.pravatar.cc/100?img=8",
+  },
+  {
+    id: "8",
+    time: "이동대 님",
+    title: "외 1인",
+    desc: "오늘 날씨 진짜 좋았네요!",
+    avatar: "https://i.pravatar.cc/100?img=9",
   },
 ];
 
@@ -37,7 +79,7 @@ export default function FeedScreen() {
       style={styles.postItem}
       onPress={() => Alert.alert(`${item.title}`, `${item.desc}`)}
     >
-      <View style={styles.thumbnail} />
+      <Image source={{ uri: item.avatar }} style={styles.thumbnail} />
       <View style={{ flex: 1 }}>
         <Text style={styles.title}>
           {item.time} {item.title}

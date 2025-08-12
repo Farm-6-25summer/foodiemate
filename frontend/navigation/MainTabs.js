@@ -23,6 +23,8 @@ export default function MainTabs() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        tabBarActiveTintColor: "#F57C00",
+        tabBarInactiveTintColor: "gray",
       })}
     >
       <Tab.Screen name="Home" component={Home} options={{ title: "홈" }} />

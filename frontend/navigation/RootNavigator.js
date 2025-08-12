@@ -10,6 +10,7 @@ import MainTabs from "./MainTabs";
 import MatchDetail from "../screens/MatchDetail";
 import ChatList from "../screens/ChatList";
 import ProfileSetup from "../screens/ProfileSetup";
+import CreatePost from "../screens/CreatePost";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,7 @@ export default function RootNavigator() {
         <Stack.Screen name="MatchDetail" component={MatchDetail} />
         <Stack.Screen name="ChatList" component={ChatList} />
         <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
+        <Stack.Screen name="CreatePost" component={CreatePost} />
       </Stack.Navigator>
     </NavigationContainer>
   );

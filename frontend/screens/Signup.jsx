@@ -38,7 +38,7 @@ export default function Signup({ navigation }) {
 
     try {
       const response = await fetch(
-        "https://fe66c90452d7.ngrok-free.app/api/signup",
+        "https://f4a826201b7a.ngrok-free.app/api/signup",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -111,7 +111,9 @@ export default function Signup({ navigation }) {
               placeholderTextColor="#FF9728"
               value={value}
               onChangeText={onChange}
+              textContentType="none"
               secureTextEntry
+              autoComplete="off"
               style={[styles.input, errors.password && styles.errorInput]}
             />
           )}
@@ -134,6 +136,8 @@ export default function Signup({ navigation }) {
               value={value}
               onChangeText={onChange}
               secureTextEntry
+              autoComplete="off"
+              textContentType="none"
               style={[
                 styles.input,
                 errors.passwordConfirm && styles.errorInput,
@@ -168,8 +172,6 @@ export default function Signup({ navigation }) {
             <Text style={styles.linkText}>로그인</Text>
           </TouchableOpacity>
         </View>
-
-        <Text style={styles.note}>* 실제 백엔드 준비되면 API 연동</Text>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -187,7 +189,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 40,
     textAlign: "center",
-    color: "#FF9728",
+    color: "black",
   },
   input: {
     borderRadius: 8,

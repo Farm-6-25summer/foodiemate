@@ -1,14 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View, Text, StyleSheet, ActivityIndicator, TextInput,
-  FlatList, TouchableOpacity, Alert, Platform
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 
-const GOOGLE_PLACES_KEY = "YOUR_API_KEY"; // ← 실제 키로 교체 (Places API 활성화 필요)
-const FALLBACK = { latitude: 37.5665, longitude: 126.9780, latitudeDelta: 0.012, longitudeDelta: 0.012 };
+const GOOGLE_PLACES_KEY = "AIzaSyCByP6j1SV17rSBrr0VQel-ICXucBkt_AA"; // ← 실제 키로 교체 (Places API 활성화 필요)
+const FALLBACK = {
+  latitude: 37.5665,
+  longitude: 126.978,
+  latitudeDelta: 0.012,
+  longitudeDelta: 0.012,
+};
 
 export default function MapScreen() {
   const mapRef = useRef(null);
@@ -25,33 +37,51 @@ export default function MapScreen() {
     (async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") { setRegion(FALLBACK); return; }
-        const acc = Platform.OS === "ios" ? Location.Accuracy.Balanced : Location.Accuracy.High;
+        if (status !== "granted") {
+          setRegion(FALLBACK);
+          return;
+        }
+        const acc =
+          Platform.OS === "ios"
+            ? Location.Accuracy.Balanced
+            : Location.Accuracy.High;
         const pos = await Promise.race([
           Location.getCurrentPositionAsync({ accuracy: acc }),
-          new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 6000)),
+          new Promise((_, rej) =>
+            setTimeout(() => rej(new Error("timeout")), 6000)
+          ),
         ]);
         setRegion({
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
-          latitudeDelta: 0.012, longitudeDelta: 0.012,
+          latitudeDelta: 0.012,
+          longitudeDelta: 0.012,
         });
-      } catch { setRegion(FALLBACK); }
-      finally { setLoading(false); }
+      } catch {
+        setRegion(FALLBACK);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
   // 자동완성(디바운스 간단 구현)
   useEffect(() => {
     const t = setTimeout(async () => {
-      if (!query || query.length < 2) { setSuggests([]); return; }
+      if (!query || query.length < 2) {
+        setSuggests([]);
+        return;
+      }
       try {
-        const url =
-          `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&language=ko&types=establishment&key=${GOOGLE_PLACES_KEY}`;
+        const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+          query
+        )}&language=ko&types=establishment&key=${GOOGLE_PLACES_KEY}`;
         const res = await fetch(url);
         const json = await res.json();
         setSuggests(json.predictions || []);
-      } catch { /* noop */ }
+      } catch {
+        /* noop */
+      }
     }, 300);
     return () => clearTimeout(t);
   }, [query]);
@@ -59,8 +89,7 @@ export default function MapScreen() {
   const pickPlace = async (prediction) => {
     try {
       // details
-      const durl =
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.place_id}&language=ko&key=${GOOGLE_PLACES_KEY}`;
+      const durl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.place_id}&language=ko&key=${GOOGLE_PLACES_KEY}`;
       const dres = await fetch(durl);
       const djson = await dres.json();
       const details = djson.result;
@@ -74,8 +103,14 @@ export default function MapScreen() {
         rating: details.rating,
         location: { latitude: lat, longitude: lng },
       };
-      setPlaces((prev) => (prev.some((x) => x.id === p.id) ? prev : [...prev, p]));
-      const next = { ...p.location, latitudeDelta: 0.008, longitudeDelta: 0.008 };
+      setPlaces((prev) =>
+        prev.some((x) => x.id === p.id) ? prev : [...prev, p]
+      );
+      const next = {
+        ...p.location,
+        latitudeDelta: 0.008,
+        longitudeDelta: 0.008,
+      };
       setRegion(next);
       mapRef.current?.animateToRegion(next, 500);
       setQuery(details.name);
@@ -95,7 +130,7 @@ export default function MapScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       {/* 상단 검색바 오버레이 */}
       <View style={styles.searchWrap}>
         <TextInput
@@ -112,8 +147,13 @@ export default function MapScreen() {
               data={suggests}
               keyExtractor={(it) => it.place_id}
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.item} onPress={() => pickPlace(item)}>
-                  <Text numberOfLines={1} style={styles.itemText}>{item.description}</Text>
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={() => pickPlace(item)}
+                >
+                  <Text numberOfLines={1} style={styles.itemText}>
+                    {item.description}
+                  </Text>
                 </TouchableOpacity>
               )}
             />
@@ -131,13 +171,22 @@ export default function MapScreen() {
         loadingEnabled
       >
         {places.map((p) => (
-          <Marker key={p.id} coordinate={p.location} title={p.name} description={p.address}>
+          <Marker
+            key={p.id}
+            coordinate={p.location}
+            title={p.name}
+            description={p.address}
+          >
             <Callout onPress={() => Alert.alert(p.name, p.address)}>
               <View style={{ maxWidth: 260 }}>
                 <Text style={{ fontWeight: "700" }}>{p.name}</Text>
                 <Text style={{ color: "#555", marginTop: 2 }}>{p.address}</Text>
-                {p.rating ? <Text style={{ marginTop: 2 }}>⭐ {p.rating}</Text> : null}
-                <Text style={{ color: "#FF9728", marginTop: 6 }}>탭하여 상세 보기</Text>
+                {p.rating ? (
+                  <Text style={{ marginTop: 2 }}>⭐ {p.rating}</Text>
+                ) : null}
+                <Text style={{ color: "#FF9728", marginTop: 6 }}>
+                  탭하여 상세 보기
+                </Text>
               </View>
             </Callout>
           </Marker>
@@ -150,12 +199,17 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#fff" },
   map: { flex: 1 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
 
   // 상단 검색 오버레이
   searchWrap: {
     position: "absolute",
-    top: 8,
+    paddingTop: 80,
     left: 12,
     right: 12,
     zIndex: 20,
@@ -184,6 +238,11 @@ const styles = StyleSheet.create({
     elevation: 3,
     overflow: "hidden",
   },
-  item: { paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: "#eee" },
+  item: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: "#eee",
+  },
   itemText: { fontSize: 13, color: "#333" },
 });
